@@ -34,13 +34,13 @@ def receber_json(ser):
         return None
     return None
 
-#def verificar_tag_no_banco(uid):
-    conn = sqlite3.connect("tags.db")
-    cursor = conn.cursor()
-    cursor.execute("SELECT nome FROM tags_autorizadas WHERE uid = ?", (uid,))
-    resultado = cursor.fetchone()
-    conn.close()
-    return resultado
+# def verificar_tag_no_banco(uid):
+#     conn = sqlite3.connect("tags.db")
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT nome FROM tags_autorizadas WHERE uid = ?", (uid,))
+#     resultado = cursor.fetchone()
+#     conn.close()
+#     return resultado
 
 
 porta = encontrar_microcontrolador()
