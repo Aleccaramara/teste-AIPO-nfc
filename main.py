@@ -18,15 +18,12 @@ def conectar_serial(porta, baudrate=9600, timeout=2):
         ser = serial.Serial(porta, baudrate=baudrate, timeout=timeout)
         time.sleep(2)
         return ser
-    except serial.SerialException as e:
-        print(f"[ERRO] Falha ao conectar à porta serial: {e}")
+    except serial.SerialException:
         return None
-
 
 def enviar_json(ser, dados):
     mensagem = json.dumps(dados)
     ser.write((mensagem + '\n').encode('utf-8'))
-
 
 def receber_json(ser):
     try:
@@ -34,9 +31,16 @@ def receber_json(ser):
         if linha:
             return json.loads(linha)
     except json.JSONDecodeError:
-        print(f"[ERRO] JSON inválido recebido: {linha}")
+        return None
     return None
 
+# def verificar_tag_no_banco(uid):
+#     conn = sqlite3.connect("tags.db")
+#     cursor = conn.cursor()
+#     cursor.execute("SELECT nome FROM tags_autorizadas WHERE uid = ?", (uid,))
+#     resultado = cursor.fetchone()
+#     conn.close()
+#     return resultado
 
 
 porta = encontrar_microcontrolador()
@@ -45,21 +49,20 @@ if porta:
     print(f"[INFO] Microcontrolador conectado na porta {porta}")
     ser = conectar_serial(porta)
 
-    if ser:
-        enviar_json(ser, {"cmd": "ler_nfc"})
-        print("[INFO] Comando enviado: ler_nfc")
+    enviar_json(ser, {"cmd": "ler_nfc"})
+    print("[INFO] Comando enviado: ler_nfc")
 
-        while True:
-            resposta = receber_json(ser)
-            if resposta:
-                if "tag" in resposta:
-                    uid = resposta["tag"]
-                    print(f"[TAG LIDA] UID: {uid}")
-                   
-                    break
-
+    while True:
+        resposta = receber_json(ser)
+        if resposta:
+            if "tag" in resposta:
+                uid = resposta["tag"]
+                resultado = print(uid)
+                if resultado:
+                    print(f"[ACESSO LIBERADO] TAG reconhecida. Bem-vindo(a), {resultado[0]}!")
+                    
                 elif "erro" in resposta:
-                    print(f"[ERRO NFC] {resposta['erro']}")
-                    break
+                 print(f"[ERRO NFC] {resposta['erro']}")
+            break
 else:
     print("[ERRO] Nenhum microcontrolador conectado via USB.")
