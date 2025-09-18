@@ -34,15 +34,6 @@ def receber_json(ser):
         return None
     return None
 
-# def verificar_tag_no_banco(uid):
-#     conn = sqlite3.connect("tags.db")
-#     cursor = conn.cursor()
-#     cursor.execute("SELECT nome FROM tags_autorizadas WHERE uid = ?", (uid,))
-#     resultado = cursor.fetchone()
-#     conn.close()
-#     return resultado
-
-
 porta = encontrar_microcontrolador()
 
 if porta:
@@ -52,17 +43,27 @@ if porta:
     enviar_json(ser, {"cmd": "ler_nfc"})
     print("[INFO] Comando enviado: ler_nfc")
 
-    while True:
+    timeout_leitura = 10  
+    tempo_inicial = time.time()
+    tag_lida = False
+
+    while (time.time() - tempo_inicial) < timeout_leitura:
         resposta = receber_json(ser)
         if resposta:
             if "tag" in resposta:
                 uid = resposta["tag"]
-                resultado = print(uid)
+                resultado = print(uid) 
                 if resultado:
                     print(f"[ACESSO LIBERADO] TAG reconhecida. Bem-vindo(a), {resultado[0]}!")
-                    
-                elif "erro" in resposta:
-                 print(f"[ERRO NFC] {resposta['erro']}")
-            break
+                tag_lida = True
+                break
+            elif "erro" in resposta:
+                print(f"[ERRO NFC] {resposta['erro']}")
+                tag_lida = True
+                break
+        time.sleep(0.1) 
+
+    if not tag_lida:
+        print("A chave não foi aproximada do sensor para ser registrada.")
+
 else:
-    print("[ERRO] Nenhum microcontrolador conectado via USB.")
