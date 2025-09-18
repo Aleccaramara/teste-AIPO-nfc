@@ -67,3 +67,4 @@ if porta:
         print("A chave não foi aproximada do sensor para ser registrada.")
 
 else:
+    print("[ERRO] Nenhum microcontrolador conectado via USB.")
