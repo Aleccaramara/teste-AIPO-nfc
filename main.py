@@ -64,7 +64,7 @@ if porta:
         time.sleep(0.1) 
 
     if not tag_lida:
-        print("A chave não foi aproximada do sensor para ser registrada.")
+        print("[ERRO] Nenhuma TAG detectada")
 
 else:
     print("[ERRO] Nenhum microcontrolador conectado via USB.")
